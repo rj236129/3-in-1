@@ -244,6 +244,7 @@
             .then((result) => {
                 console.log("User signed in:", result.user);
                 alert(`Welcome, ${result.user.displayName}`);
+                // You can save the user info to localStorage or display it on the UI
             })
             .catch((error) => {
                 console.error("Error signing in:", error);
@@ -266,52 +267,45 @@
 
     function displayJobs() {
         const jobsContainer = document.getElementById('jobs-container');
-        jobsContainer.innerHTML = ''; 
+        jobsContainer.innerHTML = '';
         jobs.forEach((job, index) => {
-            const jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = `
+            const jobElement = document.createElement('div');
+            jobElement.classList.add('job-item');
+            jobElement.innerHTML = `
                 <h3>${job.title}</h3>
-                <p>Location: ${job.location}</p>
-                <p>Salary: ${job.salary}</p>
-                <p>Description: ${job.description}</p>
-                <p>Contact: <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <p>${job.description}</p>
                 <button class="apply-btn" onclick="openApplyModal(${index})">Apply</button>
             `;
-            jobsContainer.appendChild(jobItem);
+            jobsContainer.appendChild(jobElement);
         });
     }
 
-    function openApplyModal(jobIndex) {
-        currentJobId = jobIndex;
-        const modal = document.getElementById('apply-modal');
-        modal.style.display = 'block';
+    function searchJobs() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(query));
+        jobsContainer.innerHTML = '';
+        filteredJobs.forEach((job) => {
+            const jobElement = document.createElement('div');
+            jobElement.classList.add('job-item');
+            jobElement.innerHTML = `
+                <h3>${job.title}</h3>
+                <p>${job.description}</p>
+                <button class="apply-btn" onclick="openApplyModal(${job.id})">Apply</button>
+            `;
+            jobsContainer.appendChild(jobElement);
+        });
+    }
+
+    function openApplyModal(index) {
+        currentJobId = index;
+        document.getElementById('apply-modal').style.display = 'block';
     }
 
     function closeApplyModal() {
-        const modal = document.getElementById('apply-modal');
-        modal.style.display = 'none';
+        document.getElementById('apply-modal').style.display = 'none';
     }
 
-    function submitApplication(event) {
-        event.preventDefault();
-        const name = document.getElementById('applicant-name').value;
-        const email = document.getElementById('applicant-email').value;
-        const resumeLink = document.getElementById('resume-link').value;
-
-        if (!name || !email || !resumeLink) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        alert('Application submitted successfully!');
-
-        closeApplyModal();
-    }
-
-    document.getElementById('apply-form').addEventListener('submit', submitApplication);
-
-    function postJob(event) {
+    document.getElementById('post-job-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const title = document.getElementById('job-title').value;
         const location = document.getElementById('location').value;
@@ -319,24 +313,32 @@
         const description = document.getElementById('description').value;
         const contact = document.getElementById('contact').value;
 
-        if (!title || !location || !salary || !description || !contact) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        const newJob = { title, location, salary, description, contact };
-        jobs.push(newJob);
+        const job = { id: jobs.length, title, location, salary, description, contact };
+        jobs.push(job);
         localStorage.setItem('jobs', JSON.stringify(jobs));
         displayJobs();
 
-        document.getElementById('post-job-form').reset();
-    }
+        // Reset form after submission
+        event.target.reset();
+    });
 
-    document.getElementById('post-job-form').addEventListener('submit', postJob);
+    document.getElementById('apply-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('applicant-name').value;
+        const email = document.getElementById('applicant-email').value;
+        const resume = document.getElementById('resume-link').value;
 
-    window.onload = function() {
-        displayJobs();
-    };
+        const job = jobs[currentJobId];
+        console.log(`Applied for ${job.title} by ${name} (Email: ${email})`);
+        alert('Application submitted!');
+
+        // Reset application form
+        event.target.reset();
+        closeApplyModal();
+    });
+
+    // Initial jobs display
+    displayJobs();
 </script>
 
 </body>
