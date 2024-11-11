@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs List - RJ Services</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .job-listing {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .job-listing h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .job-listing p {
+            font-size: 1rem;
+        }
+
+        .apply-btn,
+        .add-job-btn {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .apply-btn:hover,
+        .add-job-btn:hover {
+            background-color: #218838;
+        }
+
+        .add-job-btn {
+            background-color: #007bff;
+            margin-top: 30px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>RJ Services Job Portal</h1>
+    </header>
+
+    <section>
+        <h2>Available Jobs</h2>
+        <!-- Job listings will be dynamically inserted here -->
+        <div id="job-listings">
+            <!-- Dynamically loaded job postings will appear here -->
+        </div>
+
+        <!-- Add Jobs Button -->
+        <a href="post.html" class="add-job-btn">Post a Job</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 RJ Services | All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase Setup -->
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
+
+    <script>
+        // Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBSXL_KgeijcaQH0FMYgydfd9B98AZwB_I",
+  authDomain: "rj-services-6944c.firebaseapp.com",
+  projectId: "rj-services-6944c",
+  storageBucket: "rj-services-6944c.firebasestorage.app",
+  messagingSenderId: "940650268831",
+  appId: "1:940650268831:web:84f879b7f22bdebac7faaa",
+  measurementId: "G-PKRW56B1S7"
+};
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Function to load job listings from Firestore and display them
+        async function loadJobs() {
+            const jobListingsContainer = document.getElementById('job-listings');
+            
+            try {
+                const querySnapshot = await db.collection('jobs').get();
+                // Clear the current listings
+                jobListingsContainer.innerHTML = '';
+
+                // Add each job to the job listing container
+                querySnapshot.forEach((doc) => {
+                    const job = doc.data();
+                    const jobDiv = document.createElement('div');
+                    jobDiv.classList.add('job-listing');
+                    jobDiv.innerHTML = `
+                        <h3>${job.title}</h3>
+                        <p><strong>Location:</strong> ${job.location}</p>
+                        <p><strong>Requirements:</strong> ${job.requirements}</p>
+                        <a href="apply.html?jobId=${doc.id}"><button class="apply-btn">Apply</button></a>
+                    `;
+                    jobListingsContainer.appendChild(jobDiv);
+                });
+            } catch (e) {
+                console.error('Error loading jobs: ', e);
+            }
+        }
+
+        // Load jobs when the page is loaded
+        window.onload = loadJobs;
+    </script>
+
+</body>
+</html>
