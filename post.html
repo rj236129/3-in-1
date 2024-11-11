@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job - RJ Services</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        form input, form textarea, form button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Post a Job - RJ Services</h1>
+    </header>
+
+    <section>
+        <form id="job-form">
+            <input type="text" id="jobTitle" placeholder="Job Title" required />
+            <input type="text" id="jobLocation" placeholder="Location" required />
+            <textarea id="jobRequirements" placeholder="Job Requirements" rows="4" required></textarea>
+            <button type="submit">Post Job</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 RJ Services | All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Function to handle job post submission
+        document.getElementById('job-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const jobTitle = document.getElementById('jobTitle').value;
+            const jobLocation = document.getElementById('jobLocation').value;
+            const jobRequirements = document.getElementById('jobRequirements').value;
+
+            // Create job object
+            const job = {
+                title: jobTitle,
+                location: jobLocation,
+                requirements: jobRequirements
+            };
+
+            // Retrieve existing jobs from localStorage or create an empty array
+            const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+
+            // Add the new job to the array
+            jobs.push(job);
+
+            // Save the updated jobs array back to localStorage
+            localStorage.setItem('jobs', JSON.stringify(jobs));
+
+            // Redirect back to the home page
+            alert('Job posted successfully!');
+            window.location.href = 'index.html';
+        });
+    </script>
+
+</body>
+</html>
