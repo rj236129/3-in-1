@@ -159,6 +159,11 @@
     </div>
 </header>
 
+<!-- Google Sign-In Button -->
+<div id="google-signin-button">
+    <button onclick="googleSignIn()">Sign in with Google</button>
+</div>
+
 <!-- Job Listings Section -->
 <section class="job-listings">
     <h2>Available Job Listings</h2>
@@ -211,121 +216,48 @@
 <footer>
     <p>&copy; 2024 RJ Services | All rights reserved.</p>
 </footer>
+
 <script type="module">
-    // Import the functions you need from the SDKs you need
+    // Import Firebase SDK for authentication
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-  
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
     // Your web app's Firebase configuration
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
-      apiKey: "AIzaSyA29bzuGtzVW-j5uH7rcEoQ3Uo5rqH84Bw",
-      authDomain: "jobs-c48f6.firebaseapp.com",
-      projectId: "jobs-c48f6",
-      storageBucket: "jobs-c48f6.firebasestorage.app",
-      messagingSenderId: "442042297958",
-      appId: "1:442042297958:web:5f8f5cf087b0ab6af6c7a7",
-      measurementId: "G-08YTDGG4RL"
+        apiKey: "AIzaSyA29bzuGtzVW-j5uH7rcEoQ3Uo5rqH84Bw",
+        authDomain: "jobs-c48f6.firebaseapp.com",
+        projectId: "jobs-c48f6",
+        storageBucket: "jobs-c48f6.firebasestorage.app",
+        messagingSenderId: "442042297958",
+        appId: "1:442042297958:web:5f8f5cf087b0ab6af6c7a7",
+        measurementId: "G-08YTDGG4RL"
     };
-  
+
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-// Function to add a new job post to Firestore
-function addJobToFirestore(job) {
-    db.collection("jobs").add(job)
-        .then((docRef) => {
-            console.log("Job added with ID: ", docRef.id);
-            displayJobsFromFirestore(); // Refresh job listings
-        })
-        .catch((error) => {
-            console.error("Error adding job: ", error);
+    // Google Sign-In function
+    function googleSignIn() {
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                console.log("User signed in:", result.user);
+                alert(`Welcome, ${result.user.displayName}`);
+            })
+            .catch((error) => {
+                console.error("Error signing in:", error);
+            });
+    }
+
+    // Sign out function
+    function googleSignOut() {
+        signOut(auth).then(() => {
+            console.log("User signed out");
+        }).catch((error) => {
+            console.error("Error signing out:", error);
         });
-}
-
-// Function to retrieve all job posts from Firestore
-function displayJobsFromFirestore() {
-    const jobsContainer = document.getElementById('jobs-container');
-    jobsContainer.innerHTML = ''; // Clear current job listings
-
-    db.collection("jobs").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            const job = doc.data();
-            const jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = `
-                <h3>${job.title}</h3>
-                <p>Location: ${job.location}</p>
-                <p>Salary: ${job.salary}</p>
-                <p>Description: ${job.description}</p>
-                <p>Contact: <a href="mailto:${job.contact}">${job.contact}</a></p>
-                <button class="apply-btn" onclick="openApplyModal('${doc.id}')">Apply</button>
-            `;
-            jobsContainer.appendChild(jobItem);
-        });
-    });
-}
-
-// On form submission, add job to Firestore instead of localStorage
-document.getElementById('post-job-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const jobTitle = document.getElementById('job-title').value;
-    const location = document.getElementById('location').value;
-    const salary = document.getElementById('salary').value;
-    const description = document.getElementById('description').value;
-    const contact = document.getElementById('contact').value;
-
-    // Creating job object to store in Firestore
-    const job = {
-        title: jobTitle,
-        location,
-        salary,
-        description,
-        contact,
-        applications: []
-    };
-
-    // Add job to Firestore
-    addJobToFirestore(job);
-});
-
-// Call displayJobsFromFirestore on page load to load all jobs
-window.onload = displayJobsFromFirestore;
-// Posting a job to Firestore
-function postJob(job) {
-  db.collection("jobs").add(job)
-    .then((docRef) => {
-      console.log("Job posted with ID: ", docRef.id);
-    })
-    .catch((error) => {
-      console.error("Error posting job: ", error);
-    });
-}
-
-// Google Sign-In
-function googleSignIn() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      console.log("User signed in:", result.user);
-    })
-    .catch((error) => {
-      console.error("Error signing in:", error);
-    });
-}
-
-// Sign out
-function signOut() {
-  auth.signOut().then(() => {
-    console.log("User signed out");
-  });
-}
-
-
+    }
 </script>
 
 <script>
@@ -352,49 +284,60 @@ function signOut() {
 
     function openApplyModal(jobIndex) {
         currentJobId = jobIndex;
-        document.getElementById('apply-modal').style.display = 'block';
+        const modal = document.getElementById('apply-modal');
+        modal.style.display = 'block';
     }
 
     function closeApplyModal() {
-        document.getElementById('apply-modal').style.display = 'none';
+        const modal = document.getElementById('apply-modal');
+        modal.style.display = 'none';
     }
 
-    document.getElementById('apply-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-
+    function submitApplication(event) {
+        event.preventDefault();
         const name = document.getElementById('applicant-name').value;
         const email = document.getElementById('applicant-email').value;
         const resumeLink = document.getElementById('resume-link').value;
 
-        const application = { name, email, resumeLink };
-
-        jobs[currentJobId].applications = jobs[currentJobId].applications || [];
-        jobs[currentJobId].applications.push(application);
-
-        localStorage.setItem('jobs', JSON.stringify(jobs));
+        if (!name || !email || !resumeLink) {
+            alert('Please fill in all fields');
+            return;
+        }
 
         alert('Application submitted successfully!');
+
         closeApplyModal();
-    });
+    }
 
-    document.getElementById('post-job-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+    document.getElementById('apply-form').addEventListener('submit', submitApplication);
 
-        const jobTitle = document.getElementById('job-title').value;
+    function postJob(event) {
+        event.preventDefault();
+        const title = document.getElementById('job-title').value;
         const location = document.getElementById('location').value;
         const salary = document.getElementById('salary').value;
         const description = document.getElementById('description').value;
         const contact = document.getElementById('contact').value;
 
-        jobs.push({ title: jobTitle, location, salary, description, contact, applications: [] });
+        if (!title || !location || !salary || !description || !contact) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        const newJob = { title, location, salary, description, contact };
+        jobs.push(newJob);
         localStorage.setItem('jobs', JSON.stringify(jobs));
-
         displayJobs();
-    });
 
-    displayJobs();
+        document.getElementById('post-job-form').reset();
+    }
+
+    document.getElementById('post-job-form').addEventListener('submit', postJob);
+
+    window.onload = function() {
+        displayJobs();
+    };
 </script>
-
 
 </body>
 </html>
