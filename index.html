@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Postings</title>
+    <title>Job Postings with GitHub API</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -132,52 +132,98 @@
 <body>
 
 <div class="header">
-    <h1>Job Postings</h1>
-</div>    
+    <h1>Job Postings with GitHub API Integration</h1>
+</div>
 
 <div class="container">
     <input type="text" id="search-input" class="search-bar" placeholder="Search Jobs..." onkeyup="searchJobs()">
-    
+    <div id="application-form" style="display: none;">
+        <h2>Apply for Job</h2>
+        <form id="job-application-form" class="application-form">
+            <label for="applicant-name">Name:</label>
+            <input type="text" id="applicant-name" class="form-input" placeholder="Your full name" required>
+            <label for="applicant-email">Email:</label>
+            <input type="email" id="applicant-email" class="form-input" placeholder="Your email address" required>
+            <label for="resume-link">Resume Link:</label>
+            <input type="url" id="resume-link" class="form-input" placeholder="Link to your resume" required>
+            <button type="submit" class="submit-button">Submit Application</button>
+        </form>
+    </div>
+
     <div id="jobs-container"></div>
 
     <button class="post-job-btn" onclick="showPostJobModal()">Post a Job</button>
 
     <!-- Post Job Modal -->
     <div id="post-job-modal" class="modal">
-        
         <div class="modal-content">
             <h2>Post a New Job</h2>
             <form id="post-job-form">
                 <label for="job-title">Job Title:</label>
                 <input type="text" id="job-title" required><br><br>
-
                 <label for="location">Location:</label>
                 <input type="text" id="location" required><br><br>
-
                 <label for="salary">Salary:</label>
                 <input type="text" id="salary" required><br><br>
-
                 <label for="description">Job Description:</label><br>
                 <textarea id="description" rows="4" required></textarea><br><br>
-
                 <label for="contact">Contact Email:</label>
                 <input type="email" id="contact" required><br><br>
-
                 <button type="submit" class="post-job-btn">Post Job</button>
                 <button type="button" class="close-btn" onclick="closePostJobModal()">Cancel</button>
             </form>
         </div>
     </div>
-
 </div>
 
 <script>
     const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
 
-    // Show job listings
+    // Set GitHub Personal Access Token
+    const githubToken = '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'; // Replace this with your GitHub Token
+
+    // GitHub API URL
+    const githubApiUrl = 'https://api.github.com/user/repos';
+
+    // Function to make an API request to GitHub
+    function getGitHubRepos() {
+        fetch(githubApiUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `token ${githubToken}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('GitHub Repositories:', data);
+            displayRepos(data); // Display repos in your application
+        })
+        .catch(error => {
+            console.error('Error fetching GitHub data:', error);
+        });
+    }
+
+    // Display GitHub repositories in your jobs container
+    function displayRepos(repos) {
+        const jobsContainer = document.getElementById('jobs-container');
+        jobsContainer.innerHTML = '';
+        repos.forEach(repo => {
+            const jobItem = document.createElement('div');
+            jobItem.classList.add('job-item');
+            jobItem.innerHTML = `
+                <h3>${repo.name}</h3>
+                <p><strong>Description:</strong> ${repo.description || 'No description available'}</p>
+                <p><strong>Language:</strong> ${repo.language}</p>
+                <p><strong>URL:</strong> <a href="${repo.html_url}" target="_blank">${repo.html_url}</a></p>
+            `;
+            jobsContainer.appendChild(jobItem);
+        });
+    }
+
+    // Display all jobs initially
     function displayJobs() {
         const jobsContainer = document.getElementById('jobs-container');
-        jobsContainer.innerHTML = ''; 
+        jobsContainer.innerHTML = '';
         jobs.forEach((job, index) => {
             const jobItem = document.createElement('div');
             jobItem.classList.add('job-item');
@@ -195,17 +241,17 @@
         });
     }
 
-    // Show post job modal
+    // Show Post Job Modal
     function showPostJobModal() {
         document.getElementById('post-job-modal').style.display = 'flex';
     }
 
-    // Close post job modal
+    // Close Post Job Modal
     function closePostJobModal() {
         document.getElementById('post-job-modal').style.display = 'none';
     }
 
-    // Post a job
+    // Add new job
     document.getElementById('post-job-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const jobTitle = document.getElementById('job-title').value;
@@ -225,46 +271,32 @@
         jobs.push(newJob);
         localStorage.setItem('jobs', JSON.stringify(jobs));
         displayJobs();
-
-        // Send HTML code to WhatsApp
-        const jobHtml = `
-            <div class="job-item">
-                <h3>${jobTitle}</h3>
-                <p>Location: ${location}</p>
-                <p>Salary: ${salary}</p>
-                <p>Description: ${description}</p>
-                <p>Contact: <a href="mailto:${contact}">${contact}</a></p>
-            </div>
-        `;
-        const encodedMessage = encodeURIComponent(`New Job Post: ${jobHtml}`);
-        window.open(`https://wa.me/7737740207?text=${encodedMessage}`);
-
-        // Remove job after 5 minutes
-        setTimeout(() => {
-            jobs.splice(jobs.length - 1, 1); // Remove last job posted
-            localStorage.setItem('jobs', JSON.stringify(jobs));
-            displayJobs();
-        }, 5 * 60 * 1000); // 5 minutes in milliseconds
-
-        // Reset form and close modal
-        document.getElementById('post-job-form').reset();
         closePostJobModal();
     });
 
     // Apply for a job
     function applyForJob(index) {
-        const job = jobs[index];
-        alert(`You applied for: ${job.title}`);
+        document.getElementById('application-form').style.display = 'block';
+        document.getElementById('job-application-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const name = document.getElementById('applicant-name').value;
+            const email = document.getElementById('applicant-email').value;
+            const resumeLink = document.getElementById('resume-link').value;
+
+            alert(`Application submitted for ${jobs[index].title}!\nName: ${name}\nEmail: ${email}\nResume: ${resumeLink}`);
+            document.getElementById('application-form').style.display = 'none';
+            document.getElementById('job-application-form').reset();  // Reset form fields after submission
+        });
     }
 
     // Search jobs by title
     function searchJobs() {
-        const searchTerm = document.getElementById('search-input').value.toLowerCase();
-        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(searchTerm));
+        const searchValue = document.getElementById('search-input').value.toLowerCase();
+        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(searchValue));
         displayFilteredJobs(filteredJobs);
     }
 
-    // Display filtered jobs based on search
+    // Display filtered jobs based on search input
     function displayFilteredJobs(filteredJobs) {
         const jobsContainer = document.getElementById('jobs-container');
         jobsContainer.innerHTML = '';
@@ -285,8 +317,9 @@
         });
     }
 
-    // Initialize job listings
+    // Display all jobs initially
     displayJobs();
+    getGitHubRepos(); // Call GitHub API to fetch repositories
 </script>
 
 </body>
