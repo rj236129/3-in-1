@@ -30,6 +30,9 @@
             font-size: 2.2em;
             margin: 0;
         }
+        .button-container {
+            margin-bottom: 20px;
+        }
         .search-bar {
             width: 100%;
             padding: 12px;
@@ -39,7 +42,7 @@
             margin-bottom: 20px;
             background-color: #f9f9f9;
         }
-        .post-job-btn {
+        .post-job-btn, .resume-btn {
             background-color: #2ecc71;
             color: white;
             padding: 12px 24px;
@@ -50,8 +53,9 @@
             display: inline-block;
             margin-top: 15px;
             transition: all 0.3s;
+            margin-right: 10px;
         }
-        .post-job-btn:hover {
+        .post-job-btn:hover, .resume-btn:hover {
             background-color: #27ae60;
             transform: scale(1.05);
         }
@@ -133,18 +137,20 @@
 
 <div class="header">
     <h1>Job Postings</h1>
-</div>    
+</div>
 
 <div class="container">
+    <div class="button-container">
+        <button class="resume-btn" onclick="window.location.href='resume.html'">Resume</button>
+        <button class="post-job-btn" onclick="showPostJobModal()">Post a Job</button>
+    </div>
+
     <input type="text" id="search-input" class="search-bar" placeholder="Search Jobs..." onkeyup="searchJobs()">
     
     <div id="jobs-container"></div>
 
-    <button class="post-job-btn" onclick="showPostJobModal()">Post a Job</button>
-
     <!-- Post Job Modal -->
     <div id="post-job-modal" class="modal">
-        
         <div class="modal-content">
             <h2>Post a New Job</h2>
             <form id="post-job-form">
@@ -168,7 +174,6 @@
             </form>
         </div>
     </div>
-
 </div>
 
 <script>
@@ -251,23 +256,38 @@
         closePostJobModal();
     });
 
+
     // Apply for a job
     function applyForJob(index) {
         const job = jobs[index];
         alert(`You applied for: ${job.title}`);
+
+        // Generate the email body with job details
+        const jobDetails = `
+            Job Title: ${job.title}
+            Location: ${job.location}
+            Salary: ${job.salary}
+            Description: ${job.description}
+            Contact: ${job.contact}
+            
+        `;
+
+        // Open email with job details
+        const mailtoLink = `mailto:${job.contact}?subject=Job Application for ${job.title}&body=${encodeURIComponent(jobDetails)}`;
+        window.location.href = mailtoLink; 
     }
 
-    // Search jobs by title
+    // Filter jobs by search query
     function searchJobs() {
-        const searchTerm = document.getElementById('search-input').value.toLowerCase();
-        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(searchTerm));
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(query));
         displayFilteredJobs(filteredJobs);
     }
 
-    // Display filtered jobs based on search
+    // Display filtered jobs
     function displayFilteredJobs(filteredJobs) {
         const jobsContainer = document.getElementById('jobs-container');
-        jobsContainer.innerHTML = '';
+        jobsContainer.innerHTML = ''; 
         filteredJobs.forEach((job, index) => {
             const jobItem = document.createElement('div');
             jobItem.classList.add('job-item');
@@ -285,7 +305,6 @@
         });
     }
 
-    // Initialize job listings
     displayJobs();
 </script>
 
