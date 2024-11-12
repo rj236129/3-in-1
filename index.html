@@ -3,341 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RJ Services - Job Listings & Applications</title>
+    <title>Job Postings</title>
     <style>
-        /* CSS Styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f7fc;
         }
-
-        header {
-            background-color: #007bff;
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .header {
+            background: #3498db;
             color: white;
-            padding: 20px 0;
+            padding: 15px;
             text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
-
-        h1 {
+        .header h1 {
+            font-size: 2.2em;
             margin: 0;
         }
-
         .search-bar {
-            margin-top: 10px;
-        }
-
-        .search-bar input {
-            padding: 10px;
-            width: 70%;
-            margin-right: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .search-bar button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .search-bar button:hover {
-            background-color: #0056b3;
-        }
-
-        .job-listings {
-            margin: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 5px;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border-radius: 8px;
             border: 1px solid #ddd;
-        }
-
-        .jobs-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .job-item {
+            margin-bottom: 20px;
             background-color: #f9f9f9;
+        }
+        .post-job-btn {
+            background-color: #2ecc71;
+            color: white;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        .post-job-btn:hover {
+            background-color: #27ae60;
+            transform: scale(1.05);
+        }
+        .job-item {
+            background: white;
             padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
-
+        .job-item:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
         .job-item h3 {
-            margin-top: 0;
+            font-size: 1.6em;
+            color: #2c3e50;
+            margin: 0;
         }
-
+        .job-item p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin: 5px 0;
+        }
         .apply-btn {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 25px;
             margin-top: 10px;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            transition: all 0.3s;
         }
-
         .apply-btn:hover {
-            background-color: #218838;
+            background-color: #1f6f9f;
+            transform: scale(1.05);
         }
-
-        .post-job {
-            margin: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .post-job form, #apply-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .post-job input, .post-job textarea, #apply-form input {
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .post-job button, #apply-form button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-        }
-
-        /* Application form modal */
-        #apply-modal {
+        .modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            z-index: 1000;
-            width: 300px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
         }
-
-        #apply-modal-close {
-            align-self: flex-end;
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        .close-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border: none;
             cursor: pointer;
-            color: #aaa;
-            font-size: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .close-btn:hover {
+            background-color: #c0392b;
+        }
+        .apply-btn-container {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>RJ Services - Job Listings</h1>
-    <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search for jobs...">
-        <button onclick="searchJobs()">Search</button>
-    </div>
-</header>
-
-<!-- Google Sign-In Button -->
-<div id="google-signin-button">
-    <button onclick="googleSignIn()">Sign in with Google</button>
+<div class="header">
+    <h1>Job Postings</h1>
 </div>
 
-<!-- Job Listings Section -->
-<section class="job-listings">
-    <h2>Available Job Listings</h2>
-    <div class="jobs-container" id="jobs-container">
-        <!-- Job listings will be dynamically loaded here -->
+<div class="container">
+    <input type="text" id="search-input" class="search-bar" placeholder="Search Jobs..." onkeyup="searchJobs()">
+    
+    <div id="jobs-container"></div>
+
+    <button class="post-job-btn" onclick="showPostJobModal()">Post a Job</button>
+
+    <!-- Post Job Modal -->
+    <div id="post-job-modal" class="modal">
+        
+        <div class="modal-content">
+            <h2>Post a New Job</h2>
+            <form id="post-job-form">
+                <label for="job-title">Job Title:</label>
+                <input type="text" id="job-title" required><br><br>
+
+                <label for="location">Location:</label>
+                <input type="text" id="location" required><br><br>
+
+                <label for="salary">Salary:</label>
+                <input type="text" id="salary" required><br><br>
+
+                <label for="description">Job Description:</label><br>
+                <textarea id="description" rows="4" required></textarea><br><br>
+
+                <label for="contact">Contact Email:</label>
+                <input type="email" id="contact" required><br><br>
+
+                <button type="submit" class="post-job-btn">Post Job</button>
+                <button type="button" class="close-btn" onclick="closePostJobModal()">Cancel</button>
+            </form>
+        </div>
     </div>
-</section>
 
-<!-- Job Post Form Section -->
-<section class="post-job">
-    <h2>Post a New Job</h2>
-    <form id="post-job-form">
-        <label for="job-title">Job Title</label>
-        <input type="text" id="job-title" placeholder="Enter job title" required>
-
-        <label for="location">Location</label>
-        <input type="text" id="location" placeholder="Enter job location" required>
-
-        <label for="salary">Salary Range</label>
-        <input type="text" id="salary" placeholder="Enter salary range" required>
-
-        <label for="description">Job Description</label>
-        <textarea id="description" placeholder="Enter job description" required></textarea>
-
-        <label for="contact">Contact (Email or WhatsApp)</label>
-        <input type="text" id="contact" placeholder="Enter contact email or WhatsApp number" required>
-
-        <button type="submit">Post Job</button>
-    </form>
-</section>
-
-<!-- Application Form Modal -->
-<div id="apply-modal">
-    <span id="apply-modal-close" onclick="closeApplyModal()">x</span>
-    <h2>Apply for Job</h2>
-    <form id="apply-form">
-        <label for="applicant-name">Your Name</label>
-        <input type="text" id="applicant-name" placeholder="Enter your name" required>
-
-        <label for="applicant-email">Your Email</label>
-        <input type="email" id="applicant-email" placeholder="Enter your email" required>
-
-        <label for="resume-link">Resume Link</label>
-        <input type="url" id="resume-link" placeholder="Enter link to your resume" required>
-
-        <button type="submit">Submit Application</button>
-    </form>
 </div>
-
-<footer>
-    <p>&copy; 2024 RJ Services | All rights reserved.</p>
-</footer>
-
-<script type="module">
-    // Import Firebase SDK for authentication
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyA29bzuGtzVW-j5uH7rcEoQ3Uo5rqH84Bw",
-        authDomain: "jobs-c48f6.firebaseapp.com",
-        projectId: "jobs-c48f6",
-        storageBucket: "jobs-c48f6.firebasestorage.app",
-        messagingSenderId: "442042297958",
-        appId: "1:442042297958:web:5f8f5cf087b0ab6af6c7a7",
-        measurementId: "G-08YTDGG4RL"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    // Google Sign-In function
-    function googleSignIn() {
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                console.log("User signed in:", result.user);
-                alert(`Welcome, ${result.user.displayName}`);
-                // You can save the user info to localStorage or display it on the UI
-            })
-            .catch((error) => {
-                console.error("Error signing in:", error);
-            });
-    }
-
-    // Sign out function
-    function googleSignOut() {
-        signOut(auth).then(() => {
-            console.log("User signed out");
-        }).catch((error) => {
-            console.error("Error signing out:", error);
-        });
-    }
-</script>
 
 <script>
     const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
-    let currentJobId = null;
 
+    // Show job listings
     function displayJobs() {
         const jobsContainer = document.getElementById('jobs-container');
-        jobsContainer.innerHTML = '';
+        jobsContainer.innerHTML = ''; 
         jobs.forEach((job, index) => {
-            const jobElement = document.createElement('div');
-            jobElement.classList.add('job-item');
-            jobElement.innerHTML = `
+            const jobItem = document.createElement('div');
+            jobItem.classList.add('job-item');
+            jobItem.innerHTML = `
                 <h3>${job.title}</h3>
-                <p>${job.description}</p>
-                <button class="apply-btn" onclick="openApplyModal(${index})">Apply</button>
+                <p><strong>Location:</strong> ${job.location}</p>
+                <p><strong>Salary:</strong> ${job.salary}</p>
+                <p><strong>Description:</strong> ${job.description}</p>
+                <p><strong>Contact:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <div class="apply-btn-container">
+                    <button class="apply-btn" onclick="applyForJob(${index})">Apply Now</button>
+                </div>
             `;
-            jobsContainer.appendChild(jobElement);
+            jobsContainer.appendChild(jobItem);
         });
     }
 
-    function searchJobs() {
-        const query = document.getElementById('search-input').value.toLowerCase();
-        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(query));
-        jobsContainer.innerHTML = '';
-        filteredJobs.forEach((job) => {
-            const jobElement = document.createElement('div');
-            jobElement.classList.add('job-item');
-            jobElement.innerHTML = `
-                <h3>${job.title}</h3>
-                <p>${job.description}</p>
-                <button class="apply-btn" onclick="openApplyModal(${job.id})">Apply</button>
-            `;
-            jobsContainer.appendChild(jobElement);
-        });
+    // Show post job modal
+    function showPostJobModal() {
+        document.getElementById('post-job-modal').style.display = 'flex';
     }
 
-    function openApplyModal(index) {
-        currentJobId = index;
-        document.getElementById('apply-modal').style.display = 'block';
+    // Close post job modal
+    function closePostJobModal() {
+        document.getElementById('post-job-modal').style.display = 'none';
     }
 
-    function closeApplyModal() {
-        document.getElementById('apply-modal').style.display = 'none';
-    }
-
-    document.getElementById('post-job-form').addEventListener('submit', (event) => {
+    // Post a job
+    document.getElementById('post-job-form').addEventListener('submit', function (event) {
         event.preventDefault();
-        const title = document.getElementById('job-title').value;
+        const jobTitle = document.getElementById('job-title').value;
         const location = document.getElementById('location').value;
         const salary = document.getElementById('salary').value;
         const description = document.getElementById('description').value;
         const contact = document.getElementById('contact').value;
 
-        const job = { id: jobs.length, title, location, salary, description, contact };
-        jobs.push(job);
+        const newJob = {
+            title: jobTitle,
+            location: location,
+            salary: salary,
+            description: description,
+            contact: contact
+        };
+
+        jobs.push(newJob);
         localStorage.setItem('jobs', JSON.stringify(jobs));
         displayJobs();
 
-        // Reset form after submission
-        event.target.reset();
+        // Send HTML code to WhatsApp
+        const jobHtml = `
+            <div class="job-item">
+                <h3>${jobTitle}</h3>
+                <p>Location: ${location}</p>
+                <p>Salary: ${salary}</p>
+                <p>Description: ${description}</p>
+                <p>Contact: <a href="mailto:${contact}">${contact}</a></p>
+            </div>
+        `;
+        const encodedMessage = encodeURIComponent(`New Job Post: ${jobHtml}`);
+        window.open(`https://wa.me/7737740207?text=${encodedMessage}`);
+
+        // Remove job after 5 minutes
+        setTimeout(() => {
+            jobs.splice(jobs.length - 1, 1); // Remove last job posted
+            localStorage.setItem('jobs', JSON.stringify(jobs));
+            displayJobs();
+        }, 5 * 60 * 1000); // 5 minutes in milliseconds
+
+        // Reset form and close modal
+        document.getElementById('post-job-form').reset();
+        closePostJobModal();
     });
 
-    document.getElementById('apply-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const name = document.getElementById('applicant-name').value;
-        const email = document.getElementById('applicant-email').value;
-        const resume = document.getElementById('resume-link').value;
+    // Apply for a job
+    function applyForJob(index) {
+        const job = jobs[index];
+        alert(`You applied for: ${job.title}`);
+    }
 
-        const job = jobs[currentJobId];
-        console.log(`Applied for ${job.title} by ${name} (Email: ${email})`);
-        alert('Application submitted!');
+    // Search jobs by title
+    function searchJobs() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(searchTerm));
+        displayFilteredJobs(filteredJobs);
+    }
 
-        // Reset application form
-        event.target.reset();
-        closeApplyModal();
-    });
+    // Display filtered jobs based on search
+    function displayFilteredJobs(filteredJobs) {
+        const jobsContainer = document.getElementById('jobs-container');
+        jobsContainer.innerHTML = '';
+        filteredJobs.forEach((job, index) => {
+            const jobItem = document.createElement('div');
+            jobItem.classList.add('job-item');
+            jobItem.innerHTML = `
+                <h3>${job.title}</h3>
+                <p><strong>Location:</strong> ${job.location}</p>
+                <p><strong>Salary:</strong> ${job.salary}</p>
+                <p><strong>Description:</strong> ${job.description}</p>
+                <p><strong>Contact:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <div class="apply-btn-container">
+                    <button class="apply-btn" onclick="applyForJob(${index})">Apply Now</button>
+                </div>
+            `;
+            jobsContainer.appendChild(jobItem);
+        });
+    }
 
-    // Initial jobs display
+    // Initialize job listings
     displayJobs();
 </script>
 
