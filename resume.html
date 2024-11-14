@@ -90,10 +90,9 @@
         <input type="file" id="uploadResume" accept=".pdf">
       </div>
 
-      <!-- Save and Generate PDF -->
+      <!-- Save Button -->
       <div class="btn-container">
         <button type="button" onclick="saveResume()">Save</button>
-        <button type="button" onclick="generatePDF()">Generate PDF</button>
       </div>
     </form>
   </div>
@@ -176,31 +175,28 @@
       };
 
       localStorage.setItem("resumeData", JSON.stringify(resumeData));
-      document.getElementById("popup").style.display = "flex";
-    }
 
-    function generatePDF() {
+      // Generate PDF after saving the resume
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(12);
       doc.text("Resume", 10, 10);
 
-      const resumeData = JSON.parse(localStorage.getItem("resumeData"));
-      if (!resumeData) return alert("Please fill out and save the resume first!");
-
       let yPosition = 20;
       for (const [key, value] of Object.entries(resumeData)) {
-        if (value) {
-          doc.text(`${key}: ${value}`, 10, yPosition);
-          yPosition += 10;
-        }
+        doc.text(`${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`, 10, yPosition);
+        yPosition += 10;
       }
 
+      // Save the generated PDF
       doc.save("resume.pdf");
+
+      // Show the popup
+      document.getElementById("popup").style.display = "flex";
     }
 
     function redirectToJobs() {
-      window.location.href = "index.html"; // Replace with actual job portal URL
+      window.location.href = "index.html";
     }
   </script>
 </body>
