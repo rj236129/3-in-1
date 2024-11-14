@@ -168,6 +168,9 @@
 
                 <label for="contact">Contact Email:</label>
                 <input type="email" id="contact" required><br><br>
+                
+                <label for="phone">Contact Phone:</label>
+                <input type="text" id="phone" required><br><br>
 
                 <button type="submit" class="post-job-btn">Post Job</button>
                 <button type="button" class="close-btn" onclick="closePostJobModal()">Cancel</button>
@@ -179,7 +182,6 @@
 <script>
     const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
 
-    // Show job listings
     function displayJobs() {
         const jobsContainer = document.getElementById('jobs-container');
         jobsContainer.innerHTML = ''; 
@@ -191,7 +193,8 @@
                 <p><strong>Location:</strong> ${job.location}</p>
                 <p><strong>Salary:</strong> ${job.salary}</p>
                 <p><strong>Description:</strong> ${job.description}</p>
-                <p><strong>Contact:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <p><strong>Contact Email:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <p><strong>Contact Phone:</strong> ${job.phone}</p>
                 <div class="apply-btn-container">
                     <button class="apply-btn" onclick="applyForJob(${index})">Apply Now</button>
                 </div>
@@ -200,17 +203,14 @@
         });
     }
 
-    // Show post job modal
     function showPostJobModal() {
         document.getElementById('post-job-modal').style.display = 'flex';
     }
 
-    // Close post job modal
     function closePostJobModal() {
         document.getElementById('post-job-modal').style.display = 'none';
     }
 
-    // Post a job
     document.getElementById('post-job-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const jobTitle = document.getElementById('job-title').value;
@@ -218,73 +218,84 @@
         const salary = document.getElementById('salary').value;
         const description = document.getElementById('description').value;
         const contact = document.getElementById('contact').value;
+        const phone = document.getElementById('phone').value;
 
         const newJob = {
             title: jobTitle,
             location: location,
             salary: salary,
             description: description,
-            contact: contact
+            contact: contact,
+            phone: phone
         };
 
         jobs.push(newJob);
         localStorage.setItem('jobs', JSON.stringify(jobs));
         displayJobs();
 
-            // Send HTML code to WhatsApp
-            const jobHtml = `
-                <div class="job-item">
-                    <h3>${jobTitle}</h3>
-                    <p>Location: ${location}</p>
-                    <p>Salary: ${salary}</p>
-                    <p>Description: ${description}</p>
-                    <p>Contact: <a href="mailto:${contact}">${contact}</a></p>
-                </div>
-            `;
-            const encodedMessage = encodeURIComponent(`New Job Post: ${jobHtml}`);
-            window.open(`https://wa.me/7737740207?text=${encodedMessage}`);
+        const jobHtml = `
+            <div class="job-item">
+                <h3>${jobTitle}</h3>
+                <p>Location: ${location}</p>
+                <p>Salary: ${salary}</p>
+                <p>Description: ${description}</p>
+                <p>Contact Email: <a href="mailto:${contact}">${contact}</a></p>
+                <p>Contact Phone: ${phone}</p>
+            </div>
+        `;
+        const encodedMessage = encodeURIComponent(`New Job Post: ${jobHtml}`);
+        window.open(`https://wa.me/7737740207?text=${encodedMessage}`);
 
-        // Remove job after 5 minutes
         setTimeout(() => {
             jobs.splice(jobs.length - 1, 1); // Remove last job posted
             localStorage.setItem('jobs', JSON.stringify(jobs));
             displayJobs();
-        }, 5 * 60 * 1000); // 5 minutes in milliseconds
+        }, 5 * 60 * 1000);
 
-        // Reset form and close modal
         document.getElementById('post-job-form').reset();
         closePostJobModal();
     });
 
-
-    // Apply for a job
     function applyForJob(index) {
         const job = jobs[index];
         alert(`You applied for: ${job.title}`);
 
-        // Generate the email body with job details
+        const resumeData = getResumeData();
+        if (!resumeData) {
+            alert("Please complete your resume first.");
+            return;
+        }
+
         const jobDetails = `
             Job Title: ${job.title}
             Location: ${job.location}
             Salary: ${job.salary}
             Description: ${job.description}
-            Contact: ${job.contact}
+            Contact Email: ${job.contact}
+            Contact Phone: ${job.phone}
             
+            Resume Details:
+            Full Name: ${resumeData.name}
+            Phone: ${resumeData.phone}
+            Email: ${resumeData.email}
+            Address: ${resumeData.address}
+            Summary: ${resumeData.summary}
+            Work Experience: ${resumeData.workExperience}
+            Education: ${resumeData.education}
+            Skills: ${resumeData.skills}
+            Certifications: ${resumeData.certifications}
         `;
 
-        // Open email with job details
         const mailtoLink = `mailto:${job.contact}?subject=Job Application for ${job.title}&body=${encodeURIComponent(jobDetails)}`;
-        window.location.href = mailtoLink; 
+        window.location.href = mailtoLink;
     }
 
-    // Filter jobs by search query
     function searchJobs() {
         const query = document.getElementById('search-input').value.toLowerCase();
         const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(query));
         displayFilteredJobs(filteredJobs);
     }
 
-    // Display filtered jobs
     function displayFilteredJobs(filteredJobs) {
         const jobsContainer = document.getElementById('jobs-container');
         jobsContainer.innerHTML = ''; 
@@ -296,13 +307,19 @@
                 <p><strong>Location:</strong> ${job.location}</p>
                 <p><strong>Salary:</strong> ${job.salary}</p>
                 <p><strong>Description:</strong> ${job.description}</p>
-                <p><strong>Contact:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <p><strong>Contact Email:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
+                <p><strong>Contact Phone:</strong> ${job.phone}</p>
                 <div class="apply-btn-container">
                     <button class="apply-btn" onclick="applyForJob(${index})">Apply Now</button>
                 </div>
             `;
             jobsContainer.appendChild(jobItem);
         });
+    }
+
+    function getResumeData() {
+        const resumeData = localStorage.getItem("resumeData");
+        return resumeData ? JSON.parse(resumeData) : null;
     }
 
     displayJobs();
