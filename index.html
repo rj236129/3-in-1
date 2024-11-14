@@ -162,7 +162,6 @@
 <div class="header">
     <h1>Job Postings</h1>
 </div>
-
 <div class="container">
     <div class="button-container">
         <button class="resume-btn" onclick="window.location.href='resume.html'">Resume</button>
@@ -172,11 +171,11 @@
     <input type="text" id="search-input" class="search-bar" placeholder="Search Jobs..." onkeyup="searchJobs()">
     
     <div id="jobs-container"></div>
-
     <!-- Post Job Modal -->
     <div id="post-job-modal" class="modal">
         <div class="modal-content">
             <h2>Post a New Job</h2>
+            <div class="job-item"> <h3>rj</h3> <p><strong>Location:</strong> BIJOLIYA</p> <p>Salary:</strong> A</p> <p>Description:</strong> adsf</p> <p>Contact Email:</strong> <a href="mailto:ravijain236129@gmail.com">ravijain236129@gmail.com</a></p> <p>Contact Phone:</strong> 7737740207</p> </div> <div class="apply-btn-container"> <button class="apply-btn" onclick="applyForJobManually()">Apply Now</button> </div>
             <form id="post-job-form">
                 <label for="job-title">Job Title:</label>
                 <input type="text" id="job-title" required><br><br>
@@ -199,7 +198,7 @@
                 <button type="submit" class="post-job-btn">Post Job</button>
                 <button type="button" class="close-btn" onclick="closePostJobModal()">Cancel</button>
             </form>
-        </div>
+        </div>      
     </div>
 </div>
 
@@ -260,12 +259,15 @@
         const jobHtml = `
             <div class="job-item">
                 <h3>${jobTitle}</h3>
-                <p>Location: ${location}</p>
-                <p>Salary: ${salary}</p>
-                <p>Description: ${description}</p>
-                <p>Contact Email: <a href="mailto:${contact}">${contact}</a></p>
-                <p>Contact Phone: ${phone}</p>
+                <p><strong>Location:</strong> ${location}</p>
+                <p>Salary:</strong> ${salary}</p>
+                <p>Description:</strong> ${description}</p>
+                <p>Contact Email:</strong> <a href="mailto:${contact}">${contact}</a></p>
+                <p>Contact Phone:</strong> ${phone}</p>
             </div>
+            <div class="apply-btn-container">
+            <button class="apply-btn" onclick="applyForJobManually()">Apply Now</button>
+        </div>
         `;
         const encodedMessage = encodeURIComponent(`New Job Post: ${jobHtml}`);
         window.open(`https://wa.me/7737740207?text=${encodedMessage}`);
