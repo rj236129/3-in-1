@@ -3,352 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Postings</title>
+    <title>Job Portal</title>
+    <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7fc;
-            
-        }
-        .container {
-            width: 85%;
-            max-width: auto; /* Max width limit for large screens */
-            margin: auto;
-            padding: 20px;
         }
         .header {
-            background: #3498db;
+            background-color: #333;
             color: white;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
         }
-        .header h1 {
-            font-size: 2.2em;
-            margin: 0;
+        .container {
+            padding: 20px;
         }
-        .button-container {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .search-bar {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1em;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-        }
-        .post-job-btn, .resume-btn {
-            background-color: #2ecc71;
-            color: white;
-            padding: 12px 24px;
-            font-size: 1.1em;
-            border: none;
-            cursor: pointer;
-            border-radius: 30px;
-            margin-top: 15px;
-            margin-right: 10px;
-            transition: all 0.3s;
-        }
-        .post-job-btn:hover, .resume-btn:hover {
-            background-color: #27ae60;
-            transform: scale(1.05);
-        }
-        .job-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .job-item:hover {
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-        .job-item h3 {
-            font-size: 1.6em;
-            color: #2c3e50;
-            margin: 0;
-        }
-        .job-item p {
-            color: #7f8c8d;
-            font-size: 1.1em;
-            margin: 5px 0;
-        }
-        .apply-btn {
-            background-color: #2980b9;
-            color: white;
-            padding: 10px 20px;
-            font-size: 1.1em;
-            border: none;
-            cursor: pointer;
-            border-radius: 25px;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-        .apply-btn:hover {
-            background-color: #1f6f9f;
-            transform: scale(1.05);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 25px;
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
             border-radius: 10px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            background: #f9f9f9;
         }
-        .close-btn {
-            background-color: #e74c3c;
+        input, textarea, button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
             color: white;
-            padding: 12px 20px;
-            font-size: 1.1em;
             border: none;
             cursor: pointer;
-            border-radius: 8px;
-            margin-top: 15px;
         }
-        .close-btn:hover {
-            background-color: #c0392b;
+        button:hover {
+            background-color: #218838;
         }
-        .apply-btn-container {
-            text-align: center;
+        .job-list {
             margin-top: 20px;
         }
-    
-        /* Responsive Styling */
-        @media (max-width: auto) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-            .post-job-btn, .resume-btn {
-                padding: 10px 20px;
-                font-size: 1em;
-                margin-top: 0;
-                
-            }
-            .job-item h3 {
-                font-size: 1.4em;
-            }
-            .apply-btn {
-                font-size: 1em;
-                padding: 8px 16px;
-            }
+        .job-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
         }
     </style>
-    
 </head>
 <body>
 
 <div class="header">
-    <h1>Job Postings</h1>
+    <h1>Job Portal</h1>
 </div>
 
 <div class="container">
-    <div class="button-container">
-        <button class="resume-btn" onclick="window.location.href='resume.html'">Resume</button>
-        <button class="post-job-btn" onclick="showPostJobModal()">Post a Job</button>
+    <!-- Login/Sign-Up Form -->
+    <div id="auth-section">
+        <h2 id="auth-title">Login</h2>
+        <div class="form-container">
+            <input type="email" id="auth-email" placeholder="Email" required>
+            <input type="password" id="auth-password" placeholder="Password" required>
+            <button id="auth-btn">Login</button>
+            <p id="toggle-auth">Don't have an account? <span style="color: blue; cursor: pointer;">Sign Up</span></p>
+        </div>
     </div>
 
-    <input type="text" id="search-input" class="search-bar" placeholder="Search Jobs..." onkeyup="searchJobs()">
-    
-    <div id="jobs-container"></div>
-
-    <!-- Post Job Modal -->
-    <div id="post-job-modal" class="modal">
-        <div class="modal-content">
-            <h2>Post a New Job</h2>
-            <form id="post-job-form">
-                <label for="job-title">Job Title:</label>
-                <input type="text" id="job-title" required><br><br>
-
-                <label for="location">Location:</label>
-                <input type="text" id="location" required><br><br>
-
-                <label for="salary">Salary:</label>
-                <input type="text" id="salary" required><br><br>
-
-                <label for="description">Job Description:</label><br>
-                <textarea id="description" rows="4" required></textarea><br><br>
-
-                <label for="contact">Contact Email:</label>
-                <input type="email" id="contact" required><br><br>
-                
-                <label for="phone">Contact Phone:</label>
-                <input type="text" id="phone" required><br><br>
-
-                <button type="submit" class="post-job-btn">Post Job</button>
-                <button type="button" class="close-btn" onclick="closePostJobModal()">Cancel</button>
-            </form>
+    <!-- Job Posting Section -->
+    <div id="post-job-section" style="display: none;">
+        <h2>Post a Job</h2>
+        <div class="form-container">
+            <input type="text" id="job-title" placeholder="Job Title" required>
+            <input type="text" id="job-location" placeholder="Location" required>
+            <input type="text" id="job-salary" placeholder="Salary" required>
+            <textarea id="job-description" rows="4" placeholder="Job Description" required></textarea>
+            <button id="post-job-btn">Post Job</button>
         </div>
+    </div>
+
+    <!-- Job List Section -->
+    <div id="jobs-section" style="display: none;">
+        <h2>Available Jobs</h2>
+        <input type="text" id="search-input" placeholder="Search jobs..." onkeyup="searchJobs()">
+        <div class="job-list" id="job-list"></div>
     </div>
 </div>
 
-
-
 <script>
-    const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "YOUR_FIREBASE_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
 
-    function displayJobs() {
-        const jobsContainer = document.getElementById('jobs-container');
-        jobsContainer.innerHTML = ''; 
-        jobs.forEach((job, index) => {
-            const jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = `
-                <h3>${job.title}</h3>
-                <p><strong>Location:</strong> ${job.location}</p>
-                <p><strong>Salary:</strong> ${job.salary}</p>
-                <p><strong>Description:</strong> ${job.description}</p>
-                <p><strong>Contact Email:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
-                <p><strong>Contact Phone:</strong> ${job.phone}</p>
-                <div class="apply-btn-container">
-                    <button class="apply-btn" onclick="applyForJob(${index})">Apply Now</button>
-                </div>
-            `;
-            jobsContainer.appendChild(jobItem);
-        });
-    }
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
 
-    function showPostJobModal() {
-        document.getElementById('post-job-modal').style.display = 'flex';
-    }
+    const authSection = document.getElementById('auth-section');
+    const postJobSection = document.getElementById('post-job-section');
+    const jobsSection = document.getElementById('jobs-section');
+    const authTitle = document.getElementById('auth-title');
+    const toggleAuth = document.getElementById('toggle-auth');
+    const authBtn = document.getElementById('auth-btn');
 
-    function closePostJobModal() {
-        document.getElementById('post-job-modal').style.display = 'none';
-    }
+    let isLogin = true;
 
-    document.getElementById('post-job-form').addEventListener('submit', function (event) {
-        event.preventDefault();
-        const jobTitle = document.getElementById('job-title').value;
-        const location = document.getElementById('location').value;
-        const salary = document.getElementById('salary').value;
-        const description = document.getElementById('description').value;
-        const contact = document.getElementById('contact').value;
-        const phone = document.getElementById('phone').value;
-
-        const newJob = {
-            title: jobTitle,
-            location: location,
-            salary: salary,
-            description: description,
-            contact: contact,
-            phone: phone
-        };
-
-        jobs.push(newJob);
-        localStorage.setItem('jobs', JSON.stringify(jobs));
-        displayJobs();
-
-        const jobHtml = `
-            <div class="job-item">
-                <h3>${jobTitle}</h3>
-                <p>Location: ${location}</p>
-                <p>Salary: ${salary}</p>
-                <p>Description: ${description}</p>
-                <p>Contact Email: <a href="mailto:${contact}">${contact}</a></p>
-                <p>Contact Phone: ${phone}</p>  
-            </div>
-             `;
-        const encodedMessage = encodeURIComponent(`New Job Post: ${jobHtml}`);
-        window.open(`https://wa.me/7737740207?text=${encodedMessage}`);
-
-        setTimeout(() => {
-            jobs.splice(jobs.length - 1, 1); // Remove last job posted
-            localStorage.setItem('jobs', JSON.stringify(jobs));
-            displayJobs();
-        }, 5 * 60 * 1000);
-
-        document.getElementById('post-job-form').reset();
-        closePostJobModal();
+    // Toggle Login/Sign-Up
+    toggleAuth.addEventListener('click', () => {
+        isLogin = !isLogin;
+        authTitle.textContent = isLogin ? 'Login' : 'Sign Up';
+        authBtn.textContent = isLogin ? 'Login' : 'Sign Up';
+        toggleAuth.innerHTML = isLogin
+            ? "Don't have an account? <span style='color: blue; cursor: pointer;'>Sign Up</span>"
+            : "Already have an account? <span style='color: blue; cursor: pointer;'>Login</span>";
     });
 
-    function applyForJob(index) {
-        const job = jobs[index];
-        alert(`You applied for: ${job.title}`);
+    // Handle Login/Sign-Up
+    authBtn.addEventListener('click', () => {
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
 
-        const resumeData = getResumeData();
-        if (!resumeData) {
-            alert("Please complete your resume first.");
-            return;
+        if (isLogin) {
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert('Login successful!');
+                    showJobSections();
+                })
+                .catch((error) => alert('Error: ' + error.message));
+        } else {
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert('Sign-up successful!');
+                    showJobSections();
+                })
+                .catch((error) => alert('Error: ' + error.message));
         }
+    });
 
-        const jobDetails = `
-            Job Title: ${job.title}
-            Location: ${job.location}
-            Salary: ${job.salary}
-            Description: ${job.description}
-            Contact Email: ${job.contact}
-            Contact Phone: ${job.phone}
-            
-            Resume Details:
-            Full Name: ${resumeData.name}
-            Phone: ${resumeData.phone}
-            Email: ${resumeData.email}
-            Address: ${resumeData.address}
-            Summary: ${resumeData.summary}
-            Work Experience: ${resumeData.workExperience}
-            Education: ${resumeData.education}
-            Skills: ${resumeData.skills}
-            Certifications: ${resumeData.certifications}
-        `;
+    // Post Job
+    document.getElementById('post-job-btn').addEventListener('click', () => {
+        const jobTitle = document.getElementById('job-title').value;
+        const jobLocation = document.getElementById('job-location').value;
+        const jobSalary = document.getElementById('job-salary').value;
+        const jobDescription = document.getElementById('job-description').value;
 
-        const mailtoLink = `mailto:${job.contact}?subject=Job Application for ${job.title}&body=${encodeURIComponent(jobDetails)}`;
-        window.location.href = mailtoLink;
+        database.ref('jobs').push({
+            title: jobTitle,
+            location: jobLocation,
+            salary: jobSalary,
+            description: jobDescription
+        });
+
+        alert('Job posted successfully!');
+        document.getElementById('job-title').value = '';
+        document.getElementById('job-location').value = '';
+        document.getElementById('job-salary').value = '';
+        document.getElementById('job-description').value = '';
+    });
+
+    // Show Job Sections
+    function showJobSections() {
+        authSection.style.display = 'none';
+        postJobSection.style.display = 'block';
+        jobsSection.style.display = 'block';
+        fetchJobs();
     }
 
-    function searchJobs() {
-        const query = document.getElementById('search-input').value.toLowerCase();
-        const filteredJobs = jobs.filter(job => job.title.toLowerCase().includes(query));
-        displayFilteredJobs(filteredJobs);
-    }
-
-    function displayFilteredJobs(filteredJobs) {
-        const jobsContainer = document.getElementById('jobs-container');
-        jobsContainer.innerHTML = ''; 
-        filteredJobs.forEach((job, index) => {
-            const jobItem = document.createElement('div');
-            jobItem.classList.add('job-item');
-            jobItem.innerHTML = `
-                <h3>${job.title}</h3>
-                <p><strong>Location:</strong> ${job.location}</p>
-                <p><strong>Salary:</strong> ${job.salary}</p>
-                <p><strong>Description:</strong> ${job.description}</p>
-                <p><strong>Contact Email:</strong> <a href="mailto:${job.contact}">${job.contact}</a></p>
-                <p><strong>Contact Phone:</strong> ${job.phone}</p>
-                <div class="apply-btn-container">
-                    <button class="apply-btn" onclick="applyForJob(${index})">Apply Now</button>
-                </div>
-            `;
-            jobsContainer.appendChild(jobItem);
+    // Fetch Jobs
+    function fetchJobs() {
+        const jobList = document.getElementById('job-list');
+        jobList.innerHTML = '';
+        database.ref('jobs').on('value', (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const job = childSnapshot.val();
+                const jobItem = document.createElement('div');
+                jobItem.classList.add('job-item');
+                jobItem.innerHTML = `
+                    <h3>${job.title}</h3>
+                    <p><strong>Location:</strong> ${job.location}</p>
+                    <p><strong>Salary:</strong> ${job.salary}</p>
+                    <p><strong>Description:</strong> ${job.description}</p>
+                `;
+                jobList.appendChild(jobItem);
+            });
         });
     }
 
-    function getResumeData() {
-        const resumeData = localStorage.getItem("resumeData");
-        return resumeData ? JSON.parse(resumeData) : null;
+    // Search Jobs
+    function searchJobs() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const jobList = document.getElementById('job-list');
+        jobList.innerHTML = '';
+        database.ref('jobs').once('value', (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const job = childSnapshot.val();
+                if (job.title.toLowerCase().includes(query)) {
+                    const jobItem = document.createElement('div');
+                    jobItem.classList.add('job-item');
+                    jobItem.innerHTML = `
+                        <h3>${job.title}</h3>
+                        <p><strong>Location:</strong> ${job.location}</p>
+                        <p><strong>Salary:</strong> ${job.salary}</p>
+                        <p><strong>Description:</strong> ${job.description}</p>
+                    `;
+                    jobList.appendChild(jobItem);
+                }
+            });
+        });
     }
-
-    displayJobs();
 </script>
 
 </body>
